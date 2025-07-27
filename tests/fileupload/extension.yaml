@@ -1,0 +1,20 @@
+name: custom:cdp.sf.data-platform.datafreshness.sbx.min
+version: 0.0.1
+minDynatraceVersion: 1.303.0
+author:
+  name: _Cloud_Data_Platform.Squad@kiwibank.co.nz
+metrics:
+- key: cdp.sf.datafreshness.data-platform-sandbox
+  metadata:
+    displayName: data-platform-sandbox Freshness
+    unit: Count
+    description: data-platform-sandbox Freshness (1=fresh, 0=stale)
+sqlSnowflake:
+- group: data-platform-sandbox Freshness
+  schedule: 0/10 * ? * 2-6
+  query: "\n            SELECT\n                CASE\n                WHEN SNOWFLAKE.CORE.FRESHNESS(\
+    \ (SELECT LOAD_TIMESTAMP FROM SANDBOX_DATA_PLATFORM.PUBLIC.VW_DATA_PLATFORM_TEST_TOPIC_V1__ACCOUNT_DATA_V1)) < 259 THEN 1 \n                ELSE\
+    \ 0 \n                END AS Is_fresh;"
+  metrics:
+  - key: cdp.sf.datafreshness.data-platform-sandbox
+    value: col:IS_FRESH
